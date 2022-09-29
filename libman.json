@@ -1,0 +1,52 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "provider": "unpkg",
+      "library": "@microsoft/signalr@latest",
+      "destination": "wwwroot/lib/signalr/",
+      "files": [
+        "dist/browser/signalr.js",
+        "dist/browser/signalr.min.js"
+      ]
+    },
+    {
+      "provider": "unpkg",
+      "library": "vue@3.2.39",
+      "destination": "wwwroot/lib/vue3/",
+      "files": [
+        "dist/vue.global.js",
+        "dist/vue.global.prod.js"
+      ]
+    },
+    {
+      "provider": "unpkg",
+      "library": "vue3-sfc-loader@0.8.4",
+      "destination": "wwwroot/lib/vue3-sfc-loader/",
+      "files": [
+        "dist/vue3-sfc-loader.js"
+      ]
+    },
+    {
+      "provider": "unpkg",
+      "library": "vue-router@4.1.5",
+      "destination": "wwwroot/lib/vue-router/",
+      "files": [
+        "dist/vue-router.global.prod.js",
+        "dist/vue-router.global.js"
+      ]
+    },
+    {
+      "provider": "unpkg",
+      "library": "materialize-css@1.0.0",
+      "destination": "wwwroot/lib/materialize-css/",
+      "files": [
+        "dist/css/materialize.css",
+        "dist/css/materialize.min.css",
+        "dist/js/materialize.min.js",
+        "dist/js/materialize.js"
+      ]
+    }
+  ]
+}
