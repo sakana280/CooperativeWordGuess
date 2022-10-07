@@ -1,4 +1,3 @@
-using CooperativeWordGuess.Data;
 using CooperativeWordGuess.Entities;
 using Microsoft.AspNetCore.SignalR;
 

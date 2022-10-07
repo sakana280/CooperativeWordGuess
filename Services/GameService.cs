@@ -1,9 +1,6 @@
-using CooperativeWordGuess.Controllers;
 using CooperativeWordGuess.Data;
 using CooperativeWordGuess.Entities;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.AspNetCore.SignalR.Protocol;
-using System.Diagnostics;
 
 namespace CooperativeWordGuess.Hubs
 {

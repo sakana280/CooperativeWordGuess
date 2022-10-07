@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace CooperativeWordGuess.Entities
+﻿namespace CooperativeWordGuess.Entities
 {
     public record GameSummaryDTO(GuessSummary? CurrentGuess, Letter[][] PastGuesses, GameState State, int Length, string? Answer);
 
@@ -35,10 +33,8 @@ namespace CooperativeWordGuess.Entities
                 ? (game.Guesses, null)
                 : (game.Guesses.AllExceptLast(), game.Guesses.LastOrDefault());
 
-            //var pastGuesses = game.Guesses.AllExceptLast();
             var guesses = pastGuesses.Select(g => AnalyseGuess(g.Chosen!, game.Word)).ToArray();
 
-            //var currentGuess = game.Guesses.LastOrDefault();
             var currentSummary = currentGuess != null
                 ? new GuessSummary(GuessHistogram(currentGuess.Raw, 10), currentGuess.StartTimeUTC, currentGuess.EndTimeUTC)
                 : null;
