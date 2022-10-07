@@ -245,10 +245,12 @@
         },
 
         async mounted() {
-            this.connection = new signalR.HubConnectionBuilder().withUrl("/game/" + this.publicToken).build()
+            this.connection = new signalR.HubConnectionBuilder()
+                .withUrl("/game/" + this.publicToken)
+                .withAutomaticReconnect()
+                .build()
             this.connection.on("GameState", this.updateGameStateWrapped)
             await this.connection.start()
-            //todo handle onclose and onreconnected (eg when server is in break mode)
         },
 
         async unmounted() {
