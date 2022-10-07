@@ -49,11 +49,12 @@
                 if (!event.repeat) {
                     if (/^[a-zA-Z]$/.test(event.key)) {
                         this.onKey(event.key.toUpperCase())
+                        event.preventDefault()
                     } else if (event.code === 'Backspace') {
                         this.onKey('Backspace')
+                        event.preventDefault()
                     }
                 }
-                event.preventDefault()
             },
 
             onKey(key) {
