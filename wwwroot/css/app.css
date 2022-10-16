@@ -13,6 +13,15 @@ h3 {
 html {
     font-size: 1rem;
 }
+.guess-letter {
+    display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+    width: 1.5em;
+    height: 2em;
+    line-height: 2em;
+    margin: 4px 4px;
+}
 .guess-letter-initial {
     border: #787c7e solid 1px;
     background-color: white;
@@ -29,4 +38,18 @@ html {
 .guess-letter-answer {
     color: white;
     background-color: black;
+}
+.guess-progress {
+    background-color: #8bb3ef;
+    margin: 4px 4px 0px 4px;
+}
+.guess-progress div {
+    background-color: blue;
+    height: 5px;
+}
+.guess-progress.hurry {
+    background-color: #efb2b8 !important;
+}
+.guess-progress.hurry div {
+    background-color: #e70000 !important;
 }

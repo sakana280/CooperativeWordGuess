@@ -1,8 +1,8 @@
 ﻿<template>
     <h1>Collaborative Word Guess</h1>
-    <p>The most popular word is automatically selected when the time runs out for each guess.</p>
-    <game :public-token="$route.params.publicToken" :guess-word="word" @playing="onPlaying" @guess="onGuess" @finished="onFinished" />
-    <keyboard v-if="isPlaying" v-model="word" :max-length="wordLength" :letter-states="letterStates" />
+    <game :public-token="$route.params.publicToken" :guess-word="word" @ready="onReady" @playing="onPlaying" @guess="onGuess" @finished="onFinished" />
+    <keyboard v-if="showKeyboard" v-model="word" :max-length="wordLength" :letter-states="letterStates" />
+    <instructions v-if="showInstructions" :max-length="wordLength" :max-guesses="maxGuesses" />
 </template>
 
 <style scoped>
@@ -14,26 +14,36 @@
 <script>
     import game from './game.vue'
     import keyboard from './keyboard.vue'
+    import instructions from './instructions.vue'
 
     export default {
         data() {
             return {
                 word: null,
                 wordLength: null,
+                maxGuesses: null,
                 letterStates: [],
-                isPlaying: false,
+                showInstructions: false,
+                showKeyboard: false,
             }
         },
 
         components: {
             game,
             keyboard,
+            instructions,
         },
 
         methods: {
-            onPlaying(wordLength) {
+            onReady(wordLength, maxGuesses) {
                 this.wordLength = wordLength
-                this.isPlaying = true
+                this.maxGuesses = maxGuesses
+                this.showInstructions = true
+            },
+
+            onPlaying() {
+                this.showInstructions = false
+                this.showKeyboard = true
             },
 
             onGuess(letterStates) {
@@ -42,7 +52,8 @@
             },
 
             onFinished() {
-                this.isPlaying = false
+                this.showInstructions = false
+                this.showKeyboard = false
             },
         },
     }

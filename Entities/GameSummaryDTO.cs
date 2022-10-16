@@ -1,6 +1,6 @@
 ﻿namespace CooperativeWordGuess.Entities
 {
-    public record GameSummaryDTO(GuessSummary? CurrentGuess, Letter[][] PastGuesses, GameState State, int Length, string? Answer);
+    public record GameSummaryDTO(GuessSummary? CurrentGuess, Letter[][] PastGuesses, GameState State, int Length, int MaxGuesses, string? Answer);
 
     public record GuessSummary(GuessStat[] GuessCandidates, DateTimeOffset StartTimeUTC, DateTimeOffset EndTimeUTC);
 
@@ -46,7 +46,7 @@
 
             var answer = game.IsGameEnded() ? game.Word : null;
 
-            return new(currentSummary, guesses, state, game.Word.Length, answer);
+            return new(currentSummary, guesses, state, game.Word.Length, game.MaxGuesses, answer);
         }
 
         public static IEnumerable<T> AllExceptLast<T>(this ICollection<T> list)

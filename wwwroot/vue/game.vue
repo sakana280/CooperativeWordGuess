@@ -1,7 +1,7 @@
 ﻿<template>
     <div id="root">
         <div v-if="state==='Loading'">Loading...</div>
-        <div v-if="state==='Ready'">Waiting for game to start...</div>
+        <div v-if="state==='Ready'">🕐 Waiting for game to start 🕐</div>
         <div v-if="guessGrid.length" class="guess-grid" :style="`width:calc(${1.5*wordLetterCount}em + ${2*4*wordLetterCount}px)`">
             <div v-for="guess of guessGrid">
                 <div v-for="guessletter in guess" :class="`guess-letter guess-letter-${guessletter.state.toLowerCase()}`">{{guessletter.character}}</div>
@@ -29,28 +29,6 @@
         margin-left: auto;
         margin-right: auto;
     }
-    .guess-letter {
-        display: inline-block;
-        vertical-align: middle;
-        width: 1.5em;
-        height: 2em;
-        line-height: 2em;
-        margin: 4px 4px;
-    }
-    .guess-progress {
-        background-color: #8bb3ef;
-        margin: 4px 4px 0px 4px;
-    }
-    .guess-progress div {
-        background-color: blue;
-        height: 5px;
-    }
-    .guess-progress.hurry {
-        background-color: #efb2b8 !important;
-    }
-    .guess-progress.hurry div {
-        background-color: #e70000 !important;
-    }
     .candidates {
         font-size: 80%;
     }
@@ -71,14 +49,16 @@
         },
 
         emits: {
-            playing(length) { return Number.isInteger(length) },
-            guess(letterStates) { return true },
+            ready(length, maxGuesses) { return Number.isInteger(length) && Number.isInteger(maxGuesses) },
+            playing() { return true },
+            guess(letterStates) { return typeof letterStates === 'object' },
             finished() { return true },
         },
 
         data() {
             return {
                 state: 'Loading',
+                readyEmitted: false,
                 playingEmitted: false,
                 guessEmittedAtCount: 0,
                 finishedEmitted: false,
@@ -107,11 +87,12 @@
                 const grid = summary.pastGuesses
                 const wordLength = summary.length
                 this.wordLetterCount = wordLength
+                this.emitReadyEventOnce(summary.length, summary.maxGuesses)
                 this.emitGuessEventEachGuess(summary.pastGuesses)
 
                 if (summary.state === 'Playing') {
 
-                    this.emitPlayingEventOnce(wordLength)
+                    this.emitPlayingEventOnce()
 
                     grid.push(this.wordToRow(this.guessWord, wordLength, 'initial'))
 
@@ -144,9 +125,16 @@
                 this.guessGrid = grid
             },
 
-            emitPlayingEventOnce(wordLength) {
+            emitReadyEventOnce(wordLength, maxGuesses) {
+                if (!this.readyEmitted) {
+                    this.$emit('ready', wordLength, maxGuesses)
+                    this.readyEmitted = true;
+                }
+            },
+
+            emitPlayingEventOnce() {
                 if (!this.playingEmitted) {
-                    this.$emit('playing', wordLength)
+                    this.$emit('playing')
                     this.playingEmitted = true;
                 }
             },
@@ -215,7 +203,7 @@
             timerUpdate() {
                 if (this.guessStartUTC && this.guessEndUTC) {
                     const percent = (Date.now() - this.guessStartUTC) / (this.guessEndUTC - this.guessStartUTC) * 100
-                    this.guessTimePercent = Math.min(Math.max(percent, 0), 100) // clampt to 0-100
+                    this.guessTimePercent = Math.min(Math.max(percent, 0), 100) // clamp to 0-100
                 }
 
                 this.guessTimeHurry = this.guessTimePercent > 80
