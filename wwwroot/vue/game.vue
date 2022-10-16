@@ -1,6 +1,7 @@
 ﻿<template>
     <div id="root">
         <div v-if="state==='Loading'">Loading...</div>
+        <div v-if="state==='Error'">Invalid or expired game</div>
         <div v-if="state==='Ready'">🕐 Waiting for game to start 🕐</div>
         <div v-if="guessGrid.length" class="guess-grid" :style="`width:calc(${1.5*wordLetterCount}em + ${2*4*wordLetterCount}px)`">
             <div v-for="guess of guessGrid">
@@ -238,6 +239,11 @@
                 .withAutomaticReconnect()
                 .build()
             this.connection.on("GameState", this.updateGameStateWrapped)
+            const thiss = this
+            this.connection.onclose(function (error) {
+                console.error('Invalid game url: ' + error)
+                thiss.state = 'Error'
+            });
             await this.connection.start()
         },
 
