@@ -14,13 +14,15 @@ namespace CooperativeWordGuess.Hubs
 
         public override async Task OnConnectedAsync()
         {
+
+            // Validate id before proceeding further.
             var gameId = CurrentGameId();
-            await Groups.AddToGroupAsync(Context.ConnectionId, gameId);
+            var state = _gameService.GetSummary(gameId); // throws if invalid id
 
             await base.OnConnectedAsync();
 
             // Send current state upon new connection.
-            var state = _gameService.GetSummary(gameId);
+            await Groups.AddToGroupAsync(Context.ConnectionId, gameId);
             await Clients.Group(gameId).GameState(state);
         }
 
