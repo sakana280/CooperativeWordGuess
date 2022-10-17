@@ -11,8 +11,11 @@
         </div>
         <div v-if="state==='Playing'" class="candidates">
             <div v-if="guessCandidates.length==0">Be the first to guess a word!</div>
-            <template v-for="candidate of guessCandidates">
-                <div :class="{ minor: candidate.isMinor }">{{candidate.word}} ({{candidate.count}})</div> <!--todo button to allow quick guess-->
+            <template v-for="(candidate, index) of guessCandidates">
+                <button :class="{ minor: candidate.isMinor }" :data-word="candidate.word" @click="onUpVote">
+                    <i v-if="index==0 && !candidate.isMinor" class="material-icons">auto_awesome</i>
+                    {{candidate.word}} ({{candidate.count}})
+                </button>
             </template>
         </div>
         <div v-if="state==='Win'">🎈 Yeah! 🎈</div>
@@ -33,9 +36,18 @@
     .candidates {
         font-size: 80%;
     }
-    .candidates div {
-        display: inline-block;
+    .candidates button {
         margin: 15px;
+        background: transparent;
+        border: 2px dotted transparent;
+        padding: 5px;
+    }
+    .candidates button:hover {
+        border-color: lightgray;
+        border-radius: 5px;
+    }
+    .candidates button:active {
+        background-color: lightgoldenrodyellow;
     }
     .candidates .minor {
         font-size: 80%;
@@ -52,7 +64,8 @@
         emits: {
             ready(length, maxGuesses) { return Number.isInteger(length) && Number.isInteger(maxGuesses) },
             playing() { return true },
-            guess(letterStates) { return typeof letterStates === 'object' },
+            upVote(word) { return typeof word === 'string' },
+            guessEnded(letterStates) { return typeof letterStates === 'object' },
             finished() { return true },
         },
 
@@ -89,7 +102,7 @@
                 const wordLength = summary.length
                 this.wordLetterCount = wordLength
                 this.emitReadyEventOnce(summary.length, summary.maxGuesses)
-                this.emitGuessEventEachGuess(summary.pastGuesses)
+                this.emitGuessEventAfterEachGuess(summary.pastGuesses)
 
                 if (summary.state === 'Playing') {
 
@@ -140,7 +153,7 @@
                 }
             },
 
-            emitGuessEventEachGuess(pastGuesses) {
+            emitGuessEventAfterEachGuess(pastGuesses) {
                 if (pastGuesses.length != this.guessEmittedAtCount) {
                     // Aggregate all letter states across all guesses to a single letter:state map.
                     // Precedence of states is: Correct, Present, Absent
@@ -157,7 +170,7 @@
                             }
                         }
                     }
-                    this.$emit('guess', letterStates)
+                    this.$emit('guessEnded', letterStates)
                     this.guessEmittedAtCount = pastGuesses.length
                 }
             },
@@ -187,6 +200,12 @@
                 for (const candidate of this.guessCandidates) {
                     candidate.isMinor = candidate.count < average || candidate.count == 1
                 }
+            },
+
+            onUpVote(event) {
+                const word = event.target.dataset.word
+                this.$emit('upVote', word)
+                // Don't force-set this.guessWord, let the Play container sent it back to this Game.
             },
 
             startTimer() {

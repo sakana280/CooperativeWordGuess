@@ -1,6 +1,6 @@
 ﻿<template>
     <h1>Collaborative Word Guess</h1>
-    <game :public-token="$route.params.publicToken" :guess-word="word" @ready="onReady" @playing="onPlaying" @guess="onGuess" @finished="onFinished" />
+    <game :public-token="$route.params.publicToken" :guess-word="word" @ready="onReady" @playing="onPlaying" @upVote="onUpVote" @guessEnded="onGuessEnded" @finished="onFinished" />
     <keyboard v-if="showKeyboard" v-model="word" :max-length="wordLength" :letter-states="letterStates" />
     <instructions v-if="showInstructions" :max-length="wordLength" :max-guesses="maxGuesses" />
 </template>
@@ -46,7 +46,11 @@
                 this.showKeyboard = true
             },
 
-            onGuess(letterStates) {
+            onUpVote(word) {
+                this.word = word
+            },
+
+            onGuessEnded(letterStates) {
                 this.word = null
                 this.letterStates = letterStates
             },
