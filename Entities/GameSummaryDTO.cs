@@ -51,27 +51,44 @@
 
         public static IEnumerable<T> AllExceptLast<T>(this ICollection<T> list)
         {
-            var count = Math.Max(list.Count - 1, 0);
             return list.Take(list.Count - 1);
         }
 
         private static Letter[] AnalyseGuess(string guess, string word)
         {
+            // The answer word has letters replaced with space as they are matched,
+            // to handle letter colouring in the presence of duplicate letters,
+            // eg guessing FILL when the answer is SALT, the first L will show green
+            // but the second L should show grey indicating no double L in the answer.
             var wordUpper = word.ToUpperInvariant();
             var guessUpper = guess.ToUpperInvariant();
-            return guessUpper.Select((c, i) => AnalyseLetter(i, c, wordUpper)).ToArray();
-        }
 
-        private static Letter AnalyseLetter(int index, char charUpper, string wordUpper)
-        {
-            //todo make this smarter to account for duplicate letters,
-            //eg guessing FILL when the answer is SALT, the first L will show green but the second L should show grey indicating no double L in the answer.
-            if (wordUpper[index] == charUpper)
-                return new(charUpper, LetterState.Correct);
-            else if (wordUpper.Contains(charUpper))
-                return new(charUpper, LetterState.Present);
-            else
-                return new(charUpper, LetterState.Absent);
+            // Match correct/green characters first,
+            // so that guess=ELLE word=FILL doesn't colour both Ls yellow.
+            // All non-matches are marked Absent and will be analysed for Present status after.
+            var analysis = wordUpper
+                .Zip(guess, (w, g) => new Letter(g, w == g ? LetterState.Correct : LetterState.Absent))
+                .ToArray();
+
+            // wordUpper with any Correct matches replaced with a space character.
+            var remainingUpper = analysis.Zip(wordUpper, (a, c) => a.State == LetterState.Correct ? ' ' : c).ToList();
+
+            // Analyse the remaining characters as Present or leave as Absent.
+            for (var i = 0; i < wordUpper.Length; i++)
+            {
+                var a = analysis[i];
+                if (a.State != LetterState.Correct)
+                {
+                    var j = remainingUpper.IndexOf(a.Character);
+                    if (j >= 0)
+                    {
+                        analysis[i] = new Letter(a.Character, LetterState.Present);
+                        remainingUpper[j] = ' '; // replace matched letters with a space character
+                    }
+                }
+            }
+
+            return analysis;
         }
 
         private static GuessStat[] GuessHistogram(RawGuesses raw, int top)
