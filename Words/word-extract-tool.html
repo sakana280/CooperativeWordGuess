@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Word extract tool</title>
+    <script>
+        function summariseText() {
+            const wordLength = document.getElementById('wordLength').valueAsNumber;
+            const minOccurrance = 2;
+
+            // Find and count all lowercase purely-alphabetic words of the given length.
+            const allWords = document.getElementById('allWords').value.split(' ');
+            const wordDict = {}; // map of word to count
+            for (const word of allWords) {
+                if (word.length != wordLength || !/^[a-z]+$/.test(word))
+                    continue;
+
+                wordDict[word] = (wordDict[word] || 0) + 1;
+            }
+
+            // Retain all words of 2+ occurrances.
+            const frequentWords = [];
+            for (const [word, count] of Object.entries(wordDict)) {
+                if (count >= minOccurrance)
+                    frequentWords.push(word);
+            }
+
+            frequentWords.sort();
+            document.getElementById('summary').value = frequentWords.join('\n');
+            document.getElementById('info').innerText = frequentWords.length + ' words found';
+        }
+    </script>
+</head>
+<body>
+    <p>Paste a bunch of words here for summarisation.</p>
+    <p>eg paste plain text versions of some books from <a href="https://www.gutenberg.org/">Project Gutenberg</a></p>
+    <textarea id="allWords" cols="80" rows="20"></textarea><br />
+    <input id="wordLength" type="number" min="1" value="5"/>
+    <button onclick="summariseText()">Summarise</button>
+    <p>The summary includes only words satisfying the following:</p>
+    <ul>
+        <li>The specified length</li>
+        <li>Appear at least 2 times</li>
+        <li>Lowercase words - to exclude proper nouns, though this incidentally excludes words that begin sentences</li>
+        <li>Have no punctuation or any other non-alpha character in or adjacent, this incidentally excludes words that end sentences</li>
+    </ul>
+    <p id="info"></p>
+    <textarea id="summary" readonly cols="20" rows="15"></textarea>
+</body>
+</html>
