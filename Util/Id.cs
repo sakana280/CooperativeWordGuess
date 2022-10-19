@@ -42,10 +42,6 @@ namespace CooperativeWordGuess.Util
             {
                 number = BigInteger.DivRem(number, EncodeCharacters.Length, out var index);
                 encoded.Append(EncodeCharacters[(int)index]);
-                //var i = (int)(number % EncodeCharacters.Length);
-                //encoded.Append(EncodeCharacters[i]);
-                //number /= EncodeCharacters.Length;
-
             } while (number > 0);
 
             return encoded.ToString();

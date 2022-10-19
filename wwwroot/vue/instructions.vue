@@ -2,7 +2,7 @@
     <h1>Instructions:</h1>
     <div class="row">
         <div class="col s12 l6 instruction-card">
-            <p>▶ You have {{maxGuesses}} turns to guess a {{maxLength}} letter word.</p>
+            <p>▶ You have <span class="big">{{maxGuesses}} turns</span> to guess a <span class="big">{{maxLength}} letter word</span>.</p>
             <div class="center-align">
                 <div class="example-guess">
                     <div v-for="i in maxLength" class="guess-letter guess-letter-initial">{{i <= showBlankLetters ? '?' : ''}}</div>
@@ -31,6 +31,11 @@
     }
     .instruction-card {
         border: 5px solid transparent;
+    }
+    .big {
+        font-size: larger;
+        font-weight: bold;
+        color: #434343;
     }
     .example-guess {
         text-align: center;
