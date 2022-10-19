@@ -1,4 +1,4 @@
 ﻿namespace CooperativeWordGuess.Entities
 {
-    public record CreatedGameDTO(string adminToken, string publicToken);
+    public record CreatedGameDTO(string? AdminToken, string? PublicToken, GuessState Status);
 }

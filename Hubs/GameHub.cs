@@ -36,10 +36,17 @@ namespace CooperativeWordGuess.Hubs
             return gameId;
         }
 
-        public Task GuessWord(string word)
+        public Task<GuessWordResponseDTO> GuessWord(string word)
         {
-            _gameService.GuessWord(CurrentGameId(), Context.ConnectionId, word);
-            return Task.CompletedTask;
+            try
+            {
+                _gameService.GuessWord(CurrentGameId(), Context.ConnectionId, word);
+                return Task.FromResult(new GuessWordResponseDTO(GuessState.OK));
+            }
+            catch (UnknownWordException)
+            {
+                return Task.FromResult(new GuessWordResponseDTO(GuessState.UnknownWord));
+            }
         }
     }
 

@@ -12,6 +12,7 @@ namespace CooperativeWordGuess.Hubs
         private readonly ILogger _logger;
         private readonly Games _games;
         private readonly IHubContext<GameHub, IGameHubOutboundMessages> _hub;
+        private readonly Words.Words _words = new();
 
         public GameService(ILogger<GameService> logger, Games games, IHubContext<GameHub, IGameHubOutboundMessages> hub)
         {
@@ -23,6 +24,8 @@ namespace CooperativeWordGuess.Hubs
         public Game CreateGame(CreateGameDTO props)
         {
             _logger.LogInformation("Creating new game for '{word}' of {count} guesses at {interval}s/guess", props.Word, props.MaxGuesses, props.GuessDurationSeconds);
+            if (!_words.IsKnown(props.Word))
+                throw new UnknownWordException();
             var game = _games.NewGame(props);
             return game;
         }
@@ -45,6 +48,11 @@ namespace CooperativeWordGuess.Hubs
                 if (word?.Length != game.Word.Length)
                 {
                     raw.Remove(connectionId);
+                }
+                else if (!_words.IsKnown(word))
+                {
+                    raw.Remove(connectionId);
+                    throw new UnknownWordException();
                 }
                 else
                 {
@@ -167,4 +175,6 @@ namespace CooperativeWordGuess.Hubs
             }
         }
     }
+
+    public class UnknownWordException : Exception { }
 }

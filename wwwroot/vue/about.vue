@@ -15,8 +15,6 @@
         </ul>
         No login is required 👍 Your metadata is not tracked or stored 👍
     </p>
-    <p>⚠ There is no profanity filter at present. Please play nicely. ⚠</p>
-    <p>⚠ There is no spell checker at present. Learn to spell. ⚠</p>
 </template>
 
 <style scoped>

@@ -23,8 +23,15 @@ namespace CooperativeWordGuess.Controllers
         public CreatedGameDTO CreateGame(CreateGameDTO props)
         {
             _logger.LogInformation("Creating new game for '{word}' of {count} guesses at {interval}s/guess", props.Word, props.MaxGuesses, props.GuessDurationSeconds);
-            var game = _gameService.CreateGame(props);
-            return new(game.AdminToken, game.PublicToken);
+            try
+            {
+                var game = _gameService.CreateGame(props);
+                return new(game.AdminToken, game.PublicToken, GuessState.OK);
+            }
+            catch (UnknownWordException)
+            {
+                return new(null, null, GuessState.UnknownWord);
+            }
         }
 
         [HttpPost]

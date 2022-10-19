@@ -4,7 +4,7 @@
         <div v-if="state==='Error'">Invalid or expired game</div>
         <div v-if="state==='Ready'">🕐 Waiting for game to start 🕐</div>
         <div v-if="guessGrid.length" class="guess-grid" :style="`width:calc(${1.5*wordLetterCount}em + ${2*4*wordLetterCount}px)`">
-            <div v-for="guess of guessGrid">
+            <div v-for="guess of guessGrid" :class="{ unknown: unknownWord }">
                 <div v-for="guessletter in guess" :class="`guess-letter guess-letter-${guessletter.state.toLowerCase()}`">{{guessletter.character}}</div>
             </div>
             <div v-if="guessTimePercent != null" class="guess-progress" :class="{ hurry: guessTimeHurry }"><div :style="`width:${guessTimePercent}%`"></div></div>
@@ -83,6 +83,7 @@
                 guessTimePercent: null,
                 guessTimeHurry: false,
                 guessCandidates: [],
+                unknownWord: false,
                 connection: null,
                 timerId: null,
             }
@@ -172,6 +173,7 @@
                     }
                     this.$emit('guessEnded', letterStates)
                     this.guessEmittedAtCount = pastGuesses.length
+                    this.unknownWord = false
                 }
             },
 
@@ -233,7 +235,7 @@
         expose: [],
 
         watch: {
-            guessWord() {
+            async guessWord() {
                 if (this.state === 'Playing') {
                     const grid = this.guessGrid
                     grid.pop()
@@ -244,9 +246,13 @@
                         // Un-guess if word length is not the game word length.
                         const isGuessCorrectLength = (this.guessWord || '').length == this.wordLetterCount
                         const guessWord = isGuessCorrectLength ? this.guessWord : null
-                        this.connection.invoke("GuessWord", guessWord).catch(function (err) {
+
+                        try {
+                            const response = await this.connection.invoke('GuessWord', guessWord)
+                            this.unknownWord = isGuessCorrectLength && (response.status === 'UnknownWord')
+                        } catch (err) {
                             return console.error(err.toString());
-                        });
+                        }
                     }
                 }
             },
@@ -254,10 +260,10 @@
 
         async mounted() {
             this.connection = new signalR.HubConnectionBuilder()
-                .withUrl("/game/" + this.publicToken)
+                .withUrl('/game/' + this.publicToken)
                 .withAutomaticReconnect()
                 .build()
-            this.connection.on("GameState", this.updateGameStateWrapped)
+            this.connection.on('GameState', this.updateGameStateWrapped)
             const thiss = this
             this.connection.onclose(function (error) {
                 console.error('Invalid game url: ' + error)

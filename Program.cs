@@ -13,7 +13,10 @@ builder.Logging.AddDebug();
 
 builder.Services.AddSingleton<Games>();
 builder.Services.AddSingleton<GameService>();
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 builder.Services.AddSignalR().AddJsonProtocol(options =>
 {
     options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter());

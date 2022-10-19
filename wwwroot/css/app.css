@@ -22,6 +22,9 @@ html {
     line-height: 2em;
     margin: 4px 4px;
 }
+.unknown .guess-letter-initial {
+    background-color: lightsalmon;
+}
 .guess-letter-initial {
     border: #787c7e solid 1px;
     background-color: white;
