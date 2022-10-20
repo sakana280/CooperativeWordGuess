@@ -2,10 +2,16 @@
 This is a collaborative version of a word-guessing game. Either everyone wins, or you are all losers. 
 Did someone say "Wordle"? I didn't.
 
+# Build and Run
+Open in Visual Studio and hit F5.
+Host it anywhere that supports ASP.NET Core webapps.
+I use VS2022 Community as my IDE, and Azure App Service free tier to host.
+
 # Tech Stack
 [Vue3](https://vuejs.org/) + [Materialize](https://materializecss.com/) frontend 
 with an [ASP.NET Core 6.0](https://learn.microsoft.com/en-us/aspnet/core/release-notes/aspnetcore-6.0) backend.
-To keep it simple and cheap, the persistence layer is RAM.
+To keep it simple and cheap, the persistence layer is RAM, 
+but will consequently destroy any active games if the app is restarted.
 This can be deployed to the free (F1) tier of Azure App Service,
 though there could be bandwidth charges if your instance gets too popular.
 
