@@ -57,7 +57,7 @@ namespace CooperativeWordGuess.Hubs
 
             lock (game) {
                 var raw = game.Guesses[^1].Raw;
-                if (word?.Length != game.Word.Length)
+                if (word.Length != game.Word.Length)
                 {
                     raw.Remove(connectionId);
                 }

@@ -26,6 +26,15 @@ namespace CooperativeWordGuess.Hubs
             await Clients.Group(gameId).GameState(state);
         }
 
+        public override async Task OnDisconnectedAsync(Exception? exception)
+        {
+            // Prevent browser page refresh allowing easy multiple guesses,
+            // by removing this connection's guess (if any).
+            var gameId = CurrentGameId();
+            _gameService.GuessWord(CurrentGameId(), Context.ConnectionId, ""); // un-guess
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, gameId);
+        }
+
         private string CurrentGameId()
         {
             var gameId = Context?.GetHttpContext()?.GetRouteValue("id") as string;
@@ -40,6 +49,7 @@ namespace CooperativeWordGuess.Hubs
         {
             try
             {
+                word ??= ""; // signalr client might pass null to our non-nullable string param
                 _gameService.GuessWord(CurrentGameId(), Context.ConnectionId, word);
                 return Task.FromResult(new GuessWordResponseDTO(GuessState.OK));
             }

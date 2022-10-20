@@ -6,6 +6,9 @@ namespace CooperativeWordGuess.Entities
     {
         public Game(CreateGameDTO props)
         {
+            if (props.Word == null)
+                throw new ArgumentNullException(nameof(props));
+
             AdminToken = Id.Generate();
             PublicToken = Id.Generate();
             Word = props.Word.ToUpper();
