@@ -23,9 +23,21 @@ namespace CooperativeWordGuess.Hubs
 
         public Game CreateGame(CreateGameDTO props)
         {
+            if (props.Word != null)
+            {
+                if (!_words.IsKnown(props.Word))
+                    throw new UnknownWordException();
+            }
+            else if (props.Length != null)
+            {
+                props.Word = _words.GetRandom(props.Length.Value);
+            }
+            else
+            {
+                throw new InvalidOperationException();
+            }
+
             _logger.LogInformation("Creating new game for '{word}' of {count} guesses at {interval}s/guess", props.Word, props.MaxGuesses, props.GuessDurationSeconds);
-            if (!_words.IsKnown(props.Word))
-                throw new UnknownWordException();
             var game = _games.NewGame(props);
             return game;
         }

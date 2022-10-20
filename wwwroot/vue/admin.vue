@@ -3,7 +3,20 @@
     <fieldset :disabled="!isFormEnabled">
         <form>
             <div class="row">
-                <div class="input-field col s12">
+                <div class="switch col s12">
+                    <label>
+                        Choose a word for me
+                        <input type="checkbox" v-model="customWord">
+                        <span class="lever"></span>
+                        Let me choose my own word
+                    </label>
+                </div>
+                <div class="range-field col s12" v-if="!customWord">
+                    <label for="wordLength">Word Length ({{wordLength}})</label>
+                    <input id="wordLength" v-model="wordLength" type="range" min="3" max="8" />
+                    <!--<span class="thumb"><span class="value"></span></span>-->
+                </div>
+                <div class="input-field col s12" v-if="customWord">
                     <input id="word" type="text" v-model.trim="word" maxlength="8" @input="(val) => (word = word.toUpperCase())" :class="{ invalid: wordError }" />
                     <label for="word">Word</label>
                     <span class="helper-text" :data-error="wordError"></span>
@@ -37,6 +50,10 @@
         margin-top: 5px;
         margin-bottom: 7px;
     }
+    .range-field {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
 </style>
 
 <script>
@@ -45,7 +62,9 @@
     export default {
         data() {
             return {
-                word: 'WORDS', //todo generate a random default
+                customWord: false,
+                wordLength: 5,
+                word: '',
                 maxGuesses: 6,
                 guessDurationSeconds: 30,
                 isFormEnabled: true,
@@ -67,7 +86,8 @@
                 try {
                     this.isFormEnabled = false
                     var body = {
-                        word: this.word,
+                        word: this.customWord ? this.word : null,
+                        length: !this.customWord ? this.wordLength : null,
                         maxGuesses: this.maxGuesses,
                         guessDurationSeconds: this.guessDurationSeconds,
                     }
@@ -113,12 +133,25 @@
                     this.isError = true
                 }
             },
+
+            resyncMaterialize() {
+                Vue.nextTick(function () {
+                    M.updateTextFields()
+                    // Call range init if needing the "thumb" popup on the range slider
+                    // https://github.com/Dogfalo/materialize/issues/6036#issuecomment-409821994
+                    //M.Range.init(document.querySelectorAll("input[type=range]"));
+                });
+            }
         },
 
         expose: [],
 
         mounted() {
-            M.updateTextFields()
+            this.resyncMaterialize()
+        },
+
+        updated() {
+            this.resyncMaterialize()
         },
     }
 

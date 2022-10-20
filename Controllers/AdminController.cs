@@ -22,7 +22,8 @@ namespace CooperativeWordGuess.Controllers
         [Route(nameof(CreateGame))]
         public CreatedGameDTO CreateGame(CreateGameDTO props)
         {
-            _logger.LogInformation("Creating new game for '{word}' of {count} guesses at {interval}s/guess", props.Word, props.MaxGuesses, props.GuessDurationSeconds);
+            var description = props.Word != null ? $"word='{props.Word}'" : $"length={props.Length}";
+            _logger.LogInformation("Creating new game {description} of {count} guesses at {interval}s/guess", description, props.MaxGuesses, props.GuessDurationSeconds);
             try
             {
                 var game = _gameService.CreateGame(props);
